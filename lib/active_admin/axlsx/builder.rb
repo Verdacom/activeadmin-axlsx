@@ -41,7 +41,8 @@ module ActiveAdmin
       #   end
       #   @see ActiveAdmin::Axlsx::DSL
       def initialize(resource_class, options={}, &block)
-        @columns = resource_columns(resource_class)
+        @resource_class = resource_class
+        @columns = []
         parse_options options
         instance_eval &block if block_given?
       end
@@ -68,7 +69,7 @@ module ActiveAdmin
 
       # This is the I18n scope that will be used when looking up your
       # colum names in the current I18n locale.
-      # If you set it to [:active_admin, :resources, :posts] the 
+      # If you set it to [:active_admin, :resources, :posts] the
       # serializer will render the value at active_admin.resources.posts.title in the
       # current translations
       # @note If you do not set this, the column name will be titleized.
@@ -86,10 +87,11 @@ module ActiveAdmin
         @before_filter = block
       end
 
-      # The columns this builder will be serializing
-      attr_reader :columns
+      def columns
+        @columns ||= resource_columns(@resource_class)
+      end
 
-      # removes all columns from the builder. This is useful when you want to 
+      # removes all columns from the builder. This is useful when you want to
       # only render specific columns. To remove specific columns use ignore_column.
       def clear_columns
         @columns = []
